@@ -1,0 +1,63 @@
+[gd_scene load_steps=10 format=3 uid="uid://dgiwur37tdscs"]
+
+[ext_resource type="Shader" path="res://crt.gdshader" id="1_fsppv"]
+[ext_resource type="Shader" path="res://signal.gdshader" id="2_aqd7b"]
+[ext_resource type="Texture2D" uid="uid://yyqmt4sgdp0b" path="res://crt.png" id="3_ec6rc"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4hq4b"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_doltk"]
+sky_material = SubResource("ProceduralSkyMaterial_4hq4b")
+
+[sub_resource type="Environment" id="Environment_o7rjn"]
+background_mode = 2
+sky = SubResource("Sky_doltk")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_qg181"]
+shader = ExtResource("1_fsppv")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xj3sl"]
+render_priority = 0
+shader = ExtResource("2_aqd7b")
+shader_parameter/INPUT = ExtResource("3_ec6rc")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_jx0u3"]
+material = SubResource("ShaderMaterial_xj3sl")
+size = Vector2(4, 3)
+orientation = 2
+
+[node name="Node3D" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_o7rjn")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866023, -0.433016, 0.250001, -0.38885, 0.89759, 0.207671, -0.314323, 0.0826353, -0.945713, 0, 0, 0)
+shadow_enabled = true
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+material = SubResource("ShaderMaterial_qg181")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
+handle_input_locally = false
+size = Vector2i(1152, 648)
+render_target_update_mode = 4
+
+[node name="Camera3D" type="Camera3D" parent="SubViewportContainer/SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
+projection = 1
+size = 2.995
+near = 0.005
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_jx0u3")
