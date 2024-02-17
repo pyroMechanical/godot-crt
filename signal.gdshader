@@ -2,6 +2,8 @@ shader_type spatial;
 render_mode unshaded;
 
 uniform sampler2D INPUT: source_color, filter_linear_mipmap_anisotropic, repeat_disable;
+uniform sampler2D NOISE: filter_linear_mipmap_anisotropic, repeat_disable;
+uniform float noisiness: hint_range(0, 1);
 
 vec2 true_uv(vec2 uv) {
 	int active_video = 52600;
@@ -91,7 +93,7 @@ vec3 generate_video(vec2 uv) {
 			chroma_i += (samples[i]-luma)*i_carrier(temp_uv, 1.0)*i_coefficients[i];
 			chroma_q += (samples[i]-luma)*q_carrier(temp_uv, 1.0)*q_coefficients[i];
 		}
-		return gamma(yiq_to_rgb(vec3(luma, chroma_i, chroma_q)));
+		return yiq_to_rgb(vec3(luma, chroma_i, chroma_q));
 }
 
 
@@ -173,5 +175,5 @@ vec3 display_video_frames(vec2 uv) {
 }
 
 void fragment() {
-	ALBEDO = generate_video(UV)*5.0;
+	ALBEDO = (1.0 - noisiness) * generate_video(UV) + noisiness*texture(NOISE, UV).rgb;
 }
