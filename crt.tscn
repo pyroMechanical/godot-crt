@@ -1,63 +1,101 @@
-[gd_scene load_steps=10 format=3 uid="uid://dgiwur37tdscs"]
+[gd_scene load_steps=12 format=3 uid="uid://dgiwur37tdscs"]
 
-[ext_resource type="Shader" path="res://crt.gdshader" id="1_fsppv"]
+[ext_resource type="PackedScene" uid="uid://4xid2ndr6c24" path="res://tv.tscn" id="1_qply0"]
 [ext_resource type="Shader" path="res://signal.gdshader" id="2_aqd7b"]
-[ext_resource type="Texture2D" uid="uid://yyqmt4sgdp0b" path="res://crt.png" id="3_ec6rc"]
+[ext_resource type="PackedScene" uid="uid://cqvbbvutfp236" path="res://screen.tscn" id="2_e8txn"]
+[ext_resource type="Texture2D" uid="uid://clyka70wmbm35" path="res://Barns_grand_tetons.jpg" id="2_edufa"]
+[ext_resource type="Script" path="res://refresh_light.gd" id="3_m3grg"]
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4hq4b"]
-sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
-ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+[sub_resource type="ViewportTexture" id="ViewportTexture_w3cv7"]
+viewport_path = NodePath("Cube/SpotLight3D/SubViewport")
 
-[sub_resource type="Sky" id="Sky_doltk"]
-sky_material = SubResource("ProceduralSkyMaterial_4hq4b")
+[sub_resource type="World3D" id="World3D_pdhc5"]
 
-[sub_resource type="Environment" id="Environment_o7rjn"]
-background_mode = 2
-sky = SubResource("Sky_doltk")
-tonemap_mode = 2
-glow_enabled = true
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_qg181"]
-shader = ExtResource("1_fsppv")
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_xj3sl"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_g04k0"]
 render_priority = 0
 shader = ExtResource("2_aqd7b")
-shader_parameter/INPUT = ExtResource("3_ec6rc")
+shader_parameter/INPUT = ExtResource("2_edufa")
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_jx0u3"]
-material = SubResource("ShaderMaterial_xj3sl")
-size = Vector2(4, 3)
-orientation = 2
+[sub_resource type="PlaneMesh" id="PlaneMesh_sf0rm"]
+material = SubResource("ShaderMaterial_g04k0")
+orientation = 0
+
+[sub_resource type="BoxMesh" id="BoxMesh_dgmus"]
+
+[sub_resource type="Environment" id="Environment_b6q02"]
+ambient_light_source = 2
+ambient_light_color = Color(0.0588235, 0.0588235, 0.0588235, 1)
+reflected_light_source = 1
+ssao_enabled = true
+sdfgi_read_sky_light = false
+sdfgi_cascades = 7
+sdfgi_min_cell_size = 0.1
+sdfgi_cascade0_distance = 6.4
+sdfgi_max_distance = 819.2
+glow_enabled = true
+glow_bloom = 1.0
 
 [node name="Node3D" type="Node3D"]
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_o7rjn")
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.939693, 0.0593912, -0.336824, 0, 0.984808, 0.173648, 0.34202, -0.163176, 0.925417, -1.02147, 0.405147, 1.66272)
+current = true
+size = 30.0
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.866023, -0.433016, 0.250001, -0.38885, 0.89759, 0.207671, -0.314323, 0.0826353, -0.945713, 0, 0, 0)
+[node name="Cube" parent="." instance=ExtResource("1_qply0")]
+transform = Transform3D(0.769277, 0, 0.638916, 0, 1, 0, -0.638916, 0, 0.769277, 1.0162, -0.0810198, -0.875418)
+
+[node name="Sphere" parent="Cube" instance=ExtResource("2_e8txn")]
+
+[node name="SpotLight3D" type="SpotLight3D" parent="Cube"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)
+light_projector = SubResource("ViewportTexture_w3cv7")
+light_specular = 1.0
+light_bake_mode = 0
 shadow_enabled = true
+distance_fade_begin = 1.0
+distance_fade_length = 5.0
+spot_range = 3.0
+script = ExtResource("3_m3grg")
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
-material = SubResource("ShaderMaterial_qg181")
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-stretch = true
-
-[node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
-handle_input_locally = false
-size = Vector2i(1152, 648)
+[node name="SubViewport" type="SubViewport" parent="Cube/SpotLight3D"]
+own_world_3d = true
+world_3d = SubResource("World3D_pdhc5")
+debug_draw = 1
 render_target_update_mode = 4
 
-[node name="Camera3D" type="Camera3D" parent="SubViewportContainer/SubViewport"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Cube/SpotLight3D/SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
+mesh = SubResource("PlaneMesh_sf0rm")
+
+[node name="Camera3D" type="Camera3D" parent="Cube/SpotLight3D/SubViewport"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 1.50213, 0, 0)
 projection = 1
-size = 2.995
-near = 0.005
+size = 2.0
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("PlaneMesh_jx0u3")
+transform = Transform3D(6, 0, 0, 0, 1, 0, 0, 0, 6, 0, -1, 0)
+mesh = SubResource("BoxMesh_dgmus")
+
+[node name="MeshInstance3D6" type="MeshInstance3D" parent="."]
+transform = Transform3D(6, 0, 0, 0, 1, 0, 0, 0, 6, 0, 4, 0)
+mesh = SubResource("BoxMesh_dgmus")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 6, 0, 0, 0, 6, 2.5, 1.5, 0)
+mesh = SubResource("BoxMesh_dgmus")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 5, 0, 0, 0, 6, -2.5, 1.5, 0)
+mesh = SubResource("BoxMesh_dgmus")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="."]
+transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 1, 0, 1.5, -2.5)
+mesh = SubResource("BoxMesh_dgmus")
+
+[node name="MeshInstance3D5" type="MeshInstance3D" parent="."]
+transform = Transform3D(6, 0, 0, 0, 5, 0, 0, 0, 1, 0, 1.5, 2.5)
+mesh = SubResource("BoxMesh_dgmus")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_b6q02")

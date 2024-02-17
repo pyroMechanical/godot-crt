@@ -1,0 +1,15 @@
+[gd_scene load_steps=5 format=3 uid="uid://cqvbbvutfp236"]
+
+[ext_resource type="PackedScene" uid="uid://bye4k3621g6dt" path="res://Sphere.glb" id="1_hgdlb"]
+[ext_resource type="Shader" path="res://signal.gdshader" id="2_tg4f8"]
+[ext_resource type="Texture2D" uid="uid://clyka70wmbm35" path="res://Barns_grand_tetons.jpg" id="3_0x3cp"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_m5v8m"]
+render_priority = 0
+shader = ExtResource("2_tg4f8")
+shader_parameter/INPUT = ExtResource("3_0x3cp")
+
+[node name="Sphere" instance=ExtResource("1_hgdlb")]
+
+[node name="Sphere2" parent="." index="0"]
+surface_material_override/0 = SubResource("ShaderMaterial_m5v8m")
